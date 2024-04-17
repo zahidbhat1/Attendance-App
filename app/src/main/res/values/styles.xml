@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomSeekBar" parent="@style/Widget.AppCompat.SeekBar">
+        <item name="android:progressDrawable">@drawable/custom_seekbar</item>
+        <item name="android:thumb">@drawable/custom_thumb</item>
+    </style>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Other theme attributes -->
+        <!-- Custom style for ProgressBar -->
+        <item name="progressBarStyle">@style/CustomProgressBar</item>
+    </style>
+
+    <style name="CustomProgressBar" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <!-- Customize the color of the progress bar -->
+        <item name="android:progressTint">#D83434</item>
+        <!-- Customize the color of the background of the progress bar -->
+        <item name="android:progressBackgroundTint">#D83434</item>
+    </style>
+
+
+</resources>

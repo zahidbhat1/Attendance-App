@@ -1,0 +1,12 @@
+<!-- custom_thumb.xml -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background shape for the thumb (rectangle) -->
+    <!-- Image drawable for the thumb -->
+    <item android:id="@android:id/progress">
+        <bitmap
+            android:src="@drawable/icright"
+            android:gravity="center"
+            android:tint="#ffffff"
+            /> <!-- Set the height of the image -->
+    </item>
+</layer-list>
