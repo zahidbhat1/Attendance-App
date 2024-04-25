@@ -1,4 +1,4 @@
-package com.raybit.testhilt.ui
+package com.raybit.testhilt.ui.fragments
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -19,7 +19,7 @@ import com.raybit.testhilt.Utils.NetworkResult
 import com.raybit.testhilt.Utils.TokenManager
 import com.raybit.testhilt.api.UserAPI
 import com.raybit.testhilt.databinding.FragmentLoginBinding
-import com.raybit.testhilt.di.models.SignInReq
+import com.raybit.testhilt.models.login_models.SignInReq
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -69,7 +69,7 @@ class FragmentLogin : Fragment() {
             binding.progressBar.isVisible = false
             when (result) {
                 is NetworkResult.Success<*> -> {
-                    tokenManager.saveToken(result.data!!.data.toString())
+                    tokenManager.saveToken(result.data!!.data.token.toString())
                    Toast.makeText(requireContext(),"login sucess",Toast.LENGTH_LONG).show()
                     val navController = findNavController()
                     navController.navigate(R.id.action_fragmentLogin_to_fragmentHome)
@@ -92,7 +92,6 @@ class FragmentLogin : Fragment() {
         return SignInReq(emailAddress, password)
 
     }
-    // git change example
 
     private fun validateUserInput(): Pair<Boolean, String> {
         val userRequest = getUserRequest()

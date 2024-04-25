@@ -1,4 +1,4 @@
-package com.raybit.testhilt.di.models
+package com.raybit.testhilt.models.login_models
 
 data class User(
     val __v: Int,

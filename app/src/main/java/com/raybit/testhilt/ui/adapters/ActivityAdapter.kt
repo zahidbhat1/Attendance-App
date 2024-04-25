@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.raybit.testhilt.R
 import com.raybit.testhilt.ui.home_model.ActivityModel
 
-class ActivityAdapter(private val checkInList: ArrayList<ActivityModel>) :
+class ActivityAdapter(private val checkInList: List<ActivityModel>) :
     RecyclerView.Adapter<ActivityAdapter.CheckInViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CheckInViewHolder {
