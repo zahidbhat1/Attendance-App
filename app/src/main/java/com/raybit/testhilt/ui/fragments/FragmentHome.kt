@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.raybit.testhilt.AuthViewModel
 import com.raybit.testhilt.R
 import com.raybit.testhilt.Utils.NetworkResult
@@ -22,6 +23,9 @@ import com.raybit.testhilt.ui.home_model.ActivityModel
 import com.raybit.testhilt.ui.home_model.DateUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -30,12 +34,10 @@ class FragmentHome : Fragment() {
     private val binding get() = _binding!!
 
 
-
     @Inject
     lateinit var tokenManager: TokenManager
 
     private val authViewModel by viewModels<AuthViewModel>()
-
 
 
     override fun onCreateView(
@@ -46,14 +48,10 @@ class FragmentHome : Fragment() {
         return binding.root
 
 
-
-}
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-
 
 
         val currentDate = DateUtils.getCurrentDate()
@@ -73,23 +71,18 @@ class FragmentHome : Fragment() {
         rvDates.adapter = DateAdapter(next30Days)
 
 
-
-
-
-
-
         val rvCheckIn = binding.rvCheckIn
         val checkinList = arrayListOf<ActivityModel>()
-        val checkin1 = ActivityModel("19:03:2024", "10:30 am", "On Time")
-        checkinList.add(checkin1)
-        val checkin2 = ActivityModel("19:03:2024", "10:30 am", "On Time")
-        checkinList.add(checkin2)
-        val checkin4 = ActivityModel("19:03:2024", "10:30 am", "On late")
 
 
 
         rvCheckIn.adapter = ActivityAdapter(checkinList)
         var seekBar = binding.seekBar
+
+
+
+
+
         seekBar.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(p0: SeekBar?, p1: Int, p2: Boolean) {
 
@@ -121,7 +114,7 @@ class FragmentHome : Fragment() {
                                 ).show()
 
                                 seekBar.setBackgroundResource(R.drawable.custom_seekbar_checkout)
-                                seekBar.progress=0
+                                seekBar.progress = 0
 
                             } else {
                                 Toast.makeText(
@@ -143,42 +136,48 @@ class FragmentHome : Fragment() {
         authViewModel.attendanceData.observe(viewLifecycleOwner, Observer { result ->
             when (result) {
                 is NetworkResult.Success -> {
-                    val attendanceData = result.data?.data // Access the "data" object within the response
+                    val attendanceData = result.data?.data
 
-                    // Check if the "attendance" array exists and is not empty
                     if (attendanceData != null && attendanceData.attendance.isNotEmpty()) {
-                        // Iterate over each attendance record in the "attendance" array
-                        val activityList = attendanceData.attendance.map { attendanceRecord ->
-                            // Extract the date and time from the 'in' field of each record
+
+                        val activityList = attendanceData.attendance.mapNotNull { attendanceRecord ->
+
                             val dateTime = attendanceRecord.checkinTime
-                            val date = extractDate(dateTime)
-                            val time = extractTime(dateTime)
-                            val status=null
+                            if (!dateTime.isNullOrEmpty()) {
+                                val date = extractDate(dateTime)
+                                val time = extractTime(dateTime)
 
-                            // Create an ActivityModel instance for each record
-                            ActivityModel(date = date, time = time,status=null)
+                                val status ="on time "
+
+                                ActivityModel(date = date, time = time, status = status)
+                            } else {
+                                null // Skip null or empty dateTime values
+                            }
                         }
-
-                        // Update the RecyclerView adapter with the list of ActivityModel instances
-                        // Assuming that rvCheckIn is your RecyclerView for displaying attendance records
                         rvCheckIn.adapter = ActivityAdapter(activityList)
                     }
                 }
+
                 is NetworkResult.Error -> {
-                    // Handle the error here
-                    Log.e("Attendance", "Failed to fetch attendance: ${result.message ?: "Unknown error"}")
+
+                    Log.e(
+                        "Attendance",
+                        "Failed to fetch attendance: ${result.message ?: "Unknown error"}"
+                    )
                 }
+
                 is NetworkResult.Loading -> {
-                    // Handle loading state if needed
+
                 }
             }
         })
 
 
 
-        binding.tvTodayAttendence.setOnClickListener{
-    fetchAttendance()
-}
+
+        binding.tvTodayAttendence.setOnClickListener {
+            fetchAttendance()
+        }
 
     }
 
@@ -186,17 +185,40 @@ class FragmentHome : Fragment() {
 
         authViewModel.fetchAttendance()
     }
-    fun extractDate(dateTime: String): String {
-        // Assuming the date is in the format "yyyy-MM-ddTHH:mm:ss.SSSZ"
-        // Extract the date part before the 'T'
-        return dateTime.substringBefore("T")
+
+    private fun extractDate(dateTime: String?): String {
+        if (dateTime.isNullOrEmpty()) {
+            return "N/A" // or any default value you want to return for null or empty dateTime
+        }
+
+        val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val formatter = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+
+        return try {
+            val date = parser.parse(dateTime)
+            formatter.format(date!!)
+        } catch (e: ParseException) {
+            "N/A" // or handle the parse exception accordingly
+        }
     }
 
-    fun extractTime(dateTime: String): String {
-        // Assuming the date is in the format "yyyy-MM-ddTHH:mm:ss.SSSZ"
-        // Extract the time part after the 'T'
-        return dateTime.substringAfter("T").substringBeforeLast(":")
+    private fun extractTime(dateTime: String?): String {
+        if (dateTime.isNullOrEmpty()) {
+            return "N/A" // or any default value you want to return for null or empty dateTime
+        }
+
+        val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+        val formatter = SimpleDateFormat("hh:mm a", Locale.getDefault())
+
+        return try {
+            val date = parser.parse(dateTime)
+            formatter.format(date!!)
+        } catch (e: ParseException) {
+            "N/A" // or handle the parse exception accordingly
+        }
     }
+
+
 
 
 
