@@ -1,7 +1,7 @@
 package com.raybit.testhilt.api
 
 import com.raybit.testhilt.models.attendance.AttandanceModel
-import com.raybit.testhilt.models.attendance.Attendance
+import com.raybit.testhilt.models.break_models.BreakModel
 import com.raybit.testhilt.models.login_models.LoginResponse
 import com.raybit.testhilt.models.login_models.SignInReq
 import com.raybit.testhilt.ui.home_model.CheckInResponse
@@ -28,6 +28,11 @@ interface UserAPI {
     suspend fun getAttendance(
         @Header("Authorization") authToken: String
     ): Response<AttandanceModel>
+
+    @POST("break/startBreak")
+    suspend fun takeBreak(
+        @Header("Authorizaton") authToken: String
+    ):Response<BreakModel>
 
 
     }

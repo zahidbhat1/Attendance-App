@@ -187,7 +187,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/tvChkInTime2"
+                    android:id="@+id/tvChkoutTime2"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
@@ -205,8 +205,8 @@
                     android:text="On Time"
                     android:textColor="@color/black"
                     android:textSize="15sp"
-                    app:layout_constraintStart_toStartOf="@+id/tvChkInTime2"
-                    app:layout_constraintTop_toBottomOf="@+id/tvChkInTime2" />
+                    app:layout_constraintStart_toStartOf="@+id/tvChkoutTime2"
+                    app:layout_constraintTop_toBottomOf="@+id/tvChkoutTime2" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

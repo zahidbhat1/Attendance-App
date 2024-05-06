@@ -13,6 +13,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.gson.Gson
 import com.raybit.testhilt.AuthViewModel
 import com.raybit.testhilt.R
 import com.raybit.testhilt.Utils.NetworkResult
@@ -69,8 +70,14 @@ class FragmentLogin : Fragment() {
             binding.progressBar.isVisible = false
             when (result) {
                 is NetworkResult.Success<*> -> {
-                    tokenManager.saveToken(result.data!!.data.token.toString())
-                   Toast.makeText(requireContext(),"login sucess",Toast.LENGTH_LONG).show()
+                    val profile = result.data!!.data.profile
+
+
+                    tokenManager.saveToken(result.data!!.data.token)
+                    tokenManager.saveProfile(profile)
+
+
+                    Toast.makeText(requireContext(),"login sucess",Toast.LENGTH_LONG).show()
                     val navController = findNavController()
                     navController.navigate(R.id.action_fragmentLogin_to_fragmentHome)
 

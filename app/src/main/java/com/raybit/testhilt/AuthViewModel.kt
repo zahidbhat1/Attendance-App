@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.raybit.testhilt.Utils.NetworkResult
 import com.raybit.testhilt.models.attendance.AttandanceModel
+import com.raybit.testhilt.models.break_models.BreakModel
 import com.raybit.testhilt.models.login_models.LoginResponse
 import com.raybit.testhilt.models.login_models.SignInReq
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,8 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
         get() = userRepository.signInRes
     private val _attendanceData = MutableLiveData<NetworkResult<AttandanceModel>>()
     val attendanceData: LiveData<NetworkResult<AttandanceModel>> = _attendanceData
+    private val _breakStatus = MutableLiveData<NetworkResult<BreakModel>>()
+    val breakStatus: LiveData<NetworkResult<BreakModel>> = _breakStatus
 
 
 
@@ -59,6 +62,24 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
             _attendanceData.value = userRepository.getAttendance()
         }
     }
+    fun takeBreak() {
+        viewModelScope.launch {
+            val result = userRepository.takeBreak()
+            when (result) {
+                is NetworkResult.Success -> {
+                    Log.d("TakeBreakResponse", "Break successful: ${result.data}")
+                }
+                is NetworkResult.Error -> {
+                    Log.e("TakeBreakResponse", "Break failed: ${result.message}")
+                }
+                is NetworkResult.Loading -> {
+                    // Do nothing or handle loading state if necessary
+                }
+            }
+        }
+
+    }
+
 
 
 
@@ -75,4 +96,16 @@ class AuthViewModel @Inject constructor(private val userRepository: UserReposito
         }
         return result
     }
+    // Inside your AuthViewModel
+
+    fun extractTimeFromBreakData(breakData: BreakModel): Pair<String, String>? {
+        breakData.data?.existingBreak?.let { existingBreakList ->
+            if (existingBreakList.isNotEmpty()) {
+                val existingBreak = existingBreakList[0] // Assuming there's only one existing break entry
+                return Pair(existingBreak.startBreak, existingBreak.endBreak)
+            }
+        }
+        return null
+    }
+
 }

@@ -7,6 +7,7 @@ import com.raybit.testhilt.Utils.NetworkResult
 import com.raybit.testhilt.Utils.TokenManager
 import com.raybit.testhilt.api.UserAPI
 import com.raybit.testhilt.models.attendance.AttandanceModel
+import com.raybit.testhilt.models.break_models.BreakModel
 import com.raybit.testhilt.models.login_models.LoginResponse
 import com.raybit.testhilt.models.login_models.SignInReq
 import com.raybit.testhilt.ui.home_model.CheckInResponse
@@ -90,7 +91,29 @@ class UserRepository  @Inject constructor(private val userAPI: UserAPI, private 
             NetworkResult.Error("Failed to fetch attendance: ${e.message}")
         }
     }
-
+    suspend fun takeBreak(): NetworkResult<BreakModel> {
+        val token = tokenManager.getToken()
+        return try {
+            if (!token.isNullOrEmpty()) {
+                val response = userAPI.takeBreak("Bearer $token")
+                if (response.isSuccessful && response.body() != null) {
+                    val breakResponse = response.body()!!
+                    Log.d("UserRepository", "Break taken successfully. Response: $breakResponse")
+                    NetworkResult.Success(breakResponse)
+                } else {
+                    val errorObj = JSONObject(response.errorBody()?.charStream()?.readText() ?: "")
+                    NetworkResult.Error(errorObj.getString("message"))
+                }
+            } else {
+                NetworkResult.Error("Token not found")
+            }
+        } catch (e: Exception) {
+            NetworkResult.Error("Failed to take break: ${e.message}")
+        }
+    }
 
 
 }
+
+
+
